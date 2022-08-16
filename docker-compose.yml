@@ -14,29 +14,6 @@
 
 version: "3.9"
 services:
-  # the Unleash proxy is used for front-end clients, such as the
-  # JavaScript Proxy Client SDK and the React SDK.
-  #
-  # For security reasons, front-end clients shouldn't (and can't) talk
-  # directly to the Unleash server.
-  proxy:
-    image: unleashorg/unleash-proxy:v0.8.1
-    ports:
-      - "3000:3000"
-    environment:
-      # Proxy clients must use one of these keys to connect to the
-      # Proxy. To add more keys, separate them with a comma (`key1,key2`).
-      UNLEASH_PROXY_CLIENT_KEYS: "proxy-client-key"
-      # This points the Proxy to the Unleash server API
-      UNLEASH_URL: "http://web:4242/api"
-      # This is the API token that the Proxy uses to communicate with
-      # the Unleash server.
-      #
-      # NOTE: It *must* match one of the client tokens defined in
-      # `web.environment.INIT_CLIENT_API_TOKENS`
-      UNLEASH_API_TOKEN: "default:development.unleash-insecure-api-token"
-    depends_on:
-      - web
 
   # The Unleash server contains the Unleash configuration and
   # communicates with server-side SDKs and the Unleash Proxy
@@ -65,7 +42,7 @@ services:
       - db
     command: node index.js
     healthcheck:
-      test: ["CMD", "nc",  "-z", "db", "5432"]
+      test: [ "CMD", "nc", "-z", "db", "5432" ]
       interval: 1s
       timeout: 1m
       retries: 5
@@ -80,7 +57,14 @@ services:
       # trust incoming connections blindly (DON'T DO THIS IN PRODUCTION!)
       POSTGRES_HOST_AUTH_METHOD: "trust"
     healthcheck:
-      test: ["CMD", "pg_isready", "--username=postgres", "--host=127.0.0.1", "--port=5432"]
+      test:
+        [
+          "CMD",
+          "pg_isready",
+          "--username=postgres",
+          "--host=127.0.0.1",
+          "--port=5432"
+        ]
       interval: 2s
       timeout: 1m
       retries: 5
